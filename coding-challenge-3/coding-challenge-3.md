@@ -49,9 +49,9 @@ Dispatch Service
     v
 Driver
     |
-    +---- Accept ---> Ride Assigned
+    +---- Accept ---> Ride Accepted
     |
-    +---- Reject ---> Find another driver
+    +---- Reject ---> Return to matching; find another driver
 ```
 
 
@@ -206,11 +206,13 @@ PUT /drivers/{driverId}/availability
 
 ### Acceptance
 
-- Driver can become `AVAILABLE`.
-- Driver can become `OFFLINE`.
+- A driver can switch between `OFFLINE` and `AVAILABLE` through the availability API.
 - Only `AVAILABLE` drivers can receive offers.
-- `BUSY` drivers cannot receive another ride.
-- Invalid state transitions are rejected.
+- Creating an offer changes the driver from `AVAILABLE` to `OFFERED`; accepting it changes the driver from `OFFERED` to `BUSY`.
+- Rejecting an offer, or cancelling its ride before acceptance, changes the driver from `OFFERED` back to `AVAILABLE`.
+- Completing an accepted ride changes the driver from `BUSY` back to `AVAILABLE`.
+- `OFFERED` and `BUSY` drivers cannot receive another offer or switch directly to `OFFLINE` through the availability API.
+- All other driver status transitions are rejected.
 
 
 
@@ -304,11 +306,12 @@ Driver D001
 
 ### Acceptance
 
-- Ride becomes `DRIVER_ASSIGNED` when a driver is selected.
-- Driver can accept the offer.
-- Driver can reject the offer.
-- Rejected driver cannot immediately receive the same ride again.
-- Rejection causes the system to attempt another driver.
+- Creating an offer sets the ride to `DRIVER_ASSIGNED`, stores the offered driver in `assignedDriverId`, and sets that driver to `OFFERED`. This is a pending offer, not an accepted ride.
+- Only the driver holding the current offer can accept or reject it.
+- Acceptance sets the ride to `DRIVER_ACCEPTED` and the driver to `BUSY`.
+- Rejection returns the ride to `MATCHING`, clears `assignedDriverId`, and returns the driver to `AVAILABLE`.
+- A driver who rejects a ride cannot receive another offer for that same ride.
+- Rejection causes the system to attempt another eligible driver.
 
 
 
@@ -323,20 +326,12 @@ The ride lifecycle must be explicitly implemented.
 Minimum lifecycle:
 
 ```
-REQUESTED
-    |
-    v
-MATCHING
-    |
-    v
-DRIVER_ASSIGNED
-    |
-    v
-DRIVER_ACCEPTED
-    |
-    v
-COMPLETED
+REQUESTED ---> MATCHING ---> DRIVER_ASSIGNED ---> DRIVER_ACCEPTED ---> COMPLETED
+                  ^                 |
+                  +----- Reject ----+
 ```
+
+Each rejection returns the ride to `MATCHING` so another eligible driver can be offered the ride. If none remains, the ride stays in `MATCHING` with no `assignedDriverId`.
 
 Cancellation:
 
@@ -351,7 +346,7 @@ DRIVER_ASSIGNED --> CANCELLED
 - Valid transitions succeed.
 - Invalid transitions are rejected.
 - Duplicate transitions are safely handled.
-- State changes are persisted.
+- State changes, including clearing `assignedDriverId` on rejection, are persisted.
 
 Example:
 
@@ -392,10 +387,10 @@ Driver D002
 
 ### Acceptance
 
-- Rejected drivers are excluded.
+- Drivers who reject a ride are excluded from all subsequent matching attempts for that ride, even if they become available again. They remain eligible for other rides.
 - Another available driver can be selected.
-- The same driver is not repeatedly selected.
-- If no drivers remain, the ride stays unmatched.
+- The same driver is not repeatedly selected for that ride.
+- If no eligible drivers remain, the ride stays in `MATCHING` with no `assignedDriverId`.
 
 
 
@@ -449,9 +444,9 @@ Two dispatch operations may run at the same time.
 Example:
 
 ```
-                +---- Worker A ----> Driver D001
-Ride R001 ------|
-                +---- Worker B ----> Driver D001
+Ride R001 ----> Worker A ----+
+                             +----> Driver D001
+Ride R002 ----> Worker B ----+
 ```
 
 The system must prevent:
@@ -469,8 +464,9 @@ from happening simultaneously.
 ### Acceptance
 
 - The race condition is identified.
-- The implementation prevents double assignment.
-- A concurrency test demonstrates the behaviour.
+- The implementation prevents the same driver from holding two simultaneous offers or accepted rides.
+- If both rides target the same driver, only one can create an offer for that driver; the other remains in `MATCHING` or tries another eligible driver.
+- A concurrency test demonstrates this behaviour with two different rides competing for the same driver.
 - The chosen concurrency strategy is documented.
 
 Possible approaches:
@@ -547,7 +543,11 @@ The README must explain:
 
 
 
-# AC-11 - Automated Tests
+# 📋 5. Additional Evaluation Requirements
+
+The following required work is assessed under the scoring categories below.
+
+## Testing & Validation
 
 The solution must include automated tests.
 
@@ -561,21 +561,29 @@ Minimum required coverage:
 - Busy driver excluded.
 - No driver available.
 
+### Driver Status
+
+- `AVAILABLE` becomes `OFFERED` when an offer is created.
+- Rejection or cancellation before acceptance returns `OFFERED` to `AVAILABLE`.
+- Acceptance changes `OFFERED` to `BUSY`; completion returns `BUSY` to `AVAILABLE`.
+- Invalid driver status transitions are rejected.
+
 ### State Machine
 
 - Valid transition.
 - Invalid transition.
 - Duplicate transition.
+- Rejection transitions `DRIVER_ASSIGNED` back to `MATCHING` and clears `assignedDriverId`.
 
 ### Rematching
 
 - Driver rejection.
 - Second driver selected.
-- Rejected driver excluded.
+- Rejected driver excluded from subsequent offers for the same ride.
 
 ### Concurrency
 
-- Two concurrent assignments cannot assign the same driver.
+- Two concurrent rides cannot offer or assign the same driver simultaneously.
 
 ### Idempotency
 
@@ -588,7 +596,7 @@ Minimum required coverage:
 
 
 
-# AC-12 - System Design
+## System Architecture
 
 The participant must provide a system architecture diagram.
 
@@ -600,7 +608,7 @@ The participant must explain the reasoning.
 
 
 
-# AC-13 - Scalability Design
+## Scalability & Performance Design
 
 The implementation does **not** need to operate at massive scale.
 
@@ -638,7 +646,7 @@ The participant must identify at least:
 
 
 
-# AC-14 - Observability
+## Observability
 
 The implementation must provide basic observability.
 
@@ -662,7 +670,7 @@ An engineer should be able to answer:
 
 
 
-# AC-15 - Documentation
+## Documentation & Communication
 
 The repository must contain:
 
@@ -695,7 +703,7 @@ The README must explain:
 
 
 
-# 🏆 5. Scoring
+# 🏆 6. Scoring
 
 The challenge is scored out of **100 points**.
 
@@ -714,15 +722,11 @@ Acceptance Criteria are a fundamental part of the scoring.
 | Documentation & Communication     | 5          |
 | **Total**                         | **100**    |
 
-
-
-
-
 ---
 
 
 
-# 🚫 6. What Is NOT Required
+# 🚫 7. What Is NOT Required
 
 To keep the challenge focused, participants do **not** need to implement:
 
