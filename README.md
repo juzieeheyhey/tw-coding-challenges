@@ -54,7 +54,7 @@ Welcome to the TWVN Coding Challenge! Whether you're a seasoned developer or jus
 ### 👥 Teams
 
 - **Solo or teams of 1-3** — your choice
-- **Pairing encouraged:** mix senior + junior intentionally
+- **Pairing encouraged:** mix experience levels
 - Rotate pairs every challenge for variety
 
 ### ⏱️ Time Commitment
@@ -179,7 +179,7 @@ coding-challenge-{number}/<your-team-name>/
 2. **After the Deadline:** Make your fork public (if it wasn't already) and open a Pull Request from `your-fork:your-branch` into `official-repo:main`.
 3. Fill out the PR description using the template below
 4. Request review from the challenge organizers or mentors
-5. **Do not merge** — Organizers will review all PRs before Demo Day
+5. **Do not merge** - Organizers will review and score all PRs after Demo Day
 
 **Fallback (only if PR is not possible):** Share the link to your fork (and the branch) with the organizers after the Deadline.
 
@@ -374,8 +374,8 @@ Season Score = (Top Score 1) + (Top Score 2) + (Top Score 3)
 | ------------ | --------------------------------------------------------------------------------- |
 | **Week 1**   | Challenge Release & Registration                                                  |
 | **Week 2-3** | Hacking & Development — **coding Deadline at end of Week 3**                      |
-| **Week 4**   | Open your PR to the official repo (public) & Facilitator Review & Scoring        |
-| **Week 5**   | Demo Day & Winner Announcement (new challenge drops)                              |
+| **Week 4**   | Open your PR to the official repo (public), Demo Day & Solution Q&A              |
+| **Week 5**   | Facilitator Review & Scoring, Winner Announcement (new challenge drops)           |
 
 > ⚠️ **Only commits made before the end of Week 3 (the Deadline) are counted.** Commits pushed after the Deadline will be ignored during scoring. PRs are opened _after_ the Deadline so no one sees your solution before they submit theirs.
 
@@ -394,7 +394,7 @@ Each team gets **10-15 minutes** to present:
 
 ### 🔍 Deeper Discussion
 
-After Demo Day, we will host a dedicated deep Q&A session for all participating teams to dive deeper into each project, exchange ideas, and discuss technical decisions and challenges.
+In Week 4, after Demo Day, we will host a **Solution Q&A** session where anyone can ask teams follow-up questions about their submitted solutions: how it works, design decisions, trade-offs, and challenges they faced. This session is about the submissions only, not questions to reviewers about scoring.
 
 You can also prepare:
 
