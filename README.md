@@ -186,7 +186,7 @@ coding-challenge-{number}/<your-team-name>/
 2. **After the Deadline:** Make your fork public (if it wasn't already) and open a Pull Request from `your-fork:your-branch` into `official-repo:main`.
 3. Fill out the PR description using the template below
 4. Request review from the challenge organizers or mentors
-5. **Do not merge** - Organizers will review and score all PRs after Demo Day
+5. **Do not merge** — Organizers will review and score all PRs after Demo Day
 
 **Fallback (only if PR is not possible):** Share the link to your fork (and the branch) with the organizers after the Deadline.
 
@@ -444,34 +444,34 @@ You can also prepare:
 
 ## ❓ FAQ
 
-**Q: I'm still early in my career. Is this too advanced for me?**
+**Q: I'm still early in my career. Is this too advanced for me?**\
 A: Not at all! This event is designed for **all levels**. You'll be paired with others, and learning is valued as much as the solution itself. Developers at every experience level have won past challenges!
 
-**Q: What if I can't finish in time?**
+**Q: What if I can't finish in time?**\
 A: Partial solutions are 100% welcome! Submit what you have and explain what you would do next.
 
-**Q: What happens if I commit after the Deadline?**
+**Q: What happens if I commit after the Deadline?**\
 A: Only commits made **before** the Deadline are counted — anything pushed after will be ignored during scoring. Treat the Deadline as a hard cutoff for code changes, even if you haven't opened your PR yet.
 
-**Q: When should I open my Pull Request to the official repo?**
+**Q: When should I open my Pull Request to the official repo?**\
 A: **After** the Deadline. Keep your fork private (or just don't open the PR) while you're working, then make your fork public and open the PR to the official repo once the Deadline passes. Because everyone submits at the same time, you don't need to worry about other teams seeing your ideas and changing their submission.
 
-**Q: What if my solution breaks during the demo?**
+**Q: What if my solution breaks during the demo?**\
 A: It happens! Explain what was supposed to happen. Judges value your understanding and design decisions over a perfect demo.
 
-**Q: How much time should I really spend?**
+**Q: How much time should I really spend?**\
 A: Aim for **4-6 hours total** over 2 weeks. That's roughly 2 hours per week. Don't overwork — this should be fun!
 
-**Q: Can I use code from previous projects?**
+**Q: Can I use code from previous projects?**\
 A: You can reuse your own patterns and approaches, but the solution should be built for this specific challenge. No copy-pasting entire projects.
 
-**Q: What languages/frameworks are allowed?**
+**Q: What languages/frameworks are allowed?**\
 A: Unless the challenge specifies, use whatever you want! Want to try Rust? Go for it. Comfortable with Python? Perfect!
 
-**Q: Do I need to use AI tools?**
+**Q: Do I need to use AI tools?**\
 A: Nope! It's optional. If you do use them (GitHub Copilot, ChatGPT, Cursor, etc.), document how they helped for bonus points.
 
-**Q: What if I have a question not listed here?**
+**Q: What if I have a question not listed here?**\
 A: Ask in `#VietnamDevCommunity` ([join here](https://chat.google.com/room/AAAAm0xrYkU?cls=7)) or message the organizers. No question is too small!
 
 ---
@@ -485,15 +485,15 @@ Use this for questions, teammate search, and general discussion.
 
 **🆘 Need Help?**
 
-- Volunteer mentors are happy to help - just ask!
+- Volunteer mentors are happy to help — just ask!
 - Stuck? Post in the channel, we're all here to help.
 
 **📞 Organizers:**
 
 - Steve Lam — <tai.lam@thoughtworks.com>
 - Tom Tang — <tom.tang@thoughtworks.com>
-- Hanh Tran - <hanh.tran@thoughtworks.com>
-- Quy Ho - <quy.ho@thoughtworks.com>
+- Hanh Tran — <hanh.tran@thoughtworks.com>
+- Quy Ho — <quy.ho@thoughtworks.com>
 - Technical Mentors — Check `#VietnamDevCommunity` pinned messages
 
 **Have ideas to improve the event?** DM the organizers.
