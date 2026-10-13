@@ -10,7 +10,7 @@ The goal is **not** to build a complete ride-hailing platform.
 
 The goal is to demonstrate how a small dispatch service can be designed correctly today and evolved to support significantly larger scale in the future.
 
-**Timebox: 6-8 hours total.**
+**Timebox: 4-6 hours total.**
 
 
 ---
