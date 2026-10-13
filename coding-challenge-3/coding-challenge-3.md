@@ -1,0 +1,745 @@
+# 🚕 Coding Challenge #3: Ride-Hailing Dispatch Service
+
+## 🎯 Overview
+
+Design and build a simplified **Ride-Hailing Dispatch Service**.
+
+The system receives ride requests from passengers and matches them with available drivers based on their location.
+
+The goal is **not** to build a complete ride-hailing platform.
+
+The goal is to demonstrate how a small dispatch service can be designed correctly today and evolved to support significantly larger scale in the future.
+
+**Timebox: 6-8 hours total.**
+
+
+---
+
+
+
+# 🧩 1. Problem Statement
+
+A passenger wants to request a ride.
+
+The system should:
+
+1. Receive the ride request.
+2. Find an available nearby driver.
+3. Offer the ride to the driver.
+4. Allow the driver to accept or reject the ride.
+5. Find another driver if the driver rejects.
+6. Prevent a driver from being assigned to multiple rides.
+7. Handle duplicate requests/events safely.
+8. Maintain a valid ride lifecycle.
+
+Example:
+
+```
+Passenger
+    |
+    | Request Ride
+    v
+Ride Service
+    |
+    | Find nearby drivers
+    v
+Dispatch Service
+    |
+    | Offer
+    v
+Driver
+    |
+    +---- Accept ---> Ride Assigned
+    |
+    +---- Reject ---> Find another driver
+```
+
+
+
+---
+
+
+
+# 📦 2. Scope
+
+The implementation should contain the following components:
+
+```
+Ride API
+   |
+   +---- Ride Management
+   |
+   +---- Driver Management
+   |
+   +---- Dispatch / Matching
+   |
+   +---- Database
+   |
+   +---- Message Broker
+```
+
+A modular monolith is completely acceptable.
+
+The important part is demonstrating that the boundaries could evolve into separate services if required.
+
+
+
+---
+
+
+
+# 🗂️ 3. Domain Model
+
+The minimum domain contains:
+
+```
+Passenger
+Driver
+Ride
+RideOffer
+Location
+```
+
+### Driver
+
+```
+Driver
+------
+id
+status
+latitude
+longitude
+```
+
+Driver status:
+
+```
+OFFLINE
+AVAILABLE
+OFFERED
+BUSY
+```
+
+### Ride
+
+```
+Ride
+----
+id
+passengerId
+pickup
+destination
+status
+assignedDriverId
+```
+
+Ride status:
+
+```
+REQUESTED
+MATCHING
+DRIVER_ASSIGNED
+DRIVER_ACCEPTED
+CANCELLED
+COMPLETED
+```
+
+
+
+---
+
+
+
+# ✅ 4. Acceptance Criteria
+
+The following Acceptance Criteria define the required scope.
+
+## AC-01 - Create Ride
+
+The system must provide an API to create a ride.
+
+Example:
+
+```
+POST /rides
+```
+
+Request:
+
+```
+{
+  "passengerId": "P001",
+  "pickup": {
+    "latitude": 10.7769,
+    "longitude": 106.7009
+  },
+  "destination": {
+    "latitude": 10.8231,
+    "longitude": 106.6297
+  }
+}
+```
+
+### Acceptance
+
+- A unique `rideId` is generated.
+- Ride starts in `REQUESTED`.
+- Invalid coordinates are rejected.
+- Invalid passenger information is rejected.
+- Created ride can be retrieved.
+
+
+
+---
+
+
+
+# AC-02 - Driver Availability
+
+The system must allow drivers to mark themselves as available or unavailable.
+
+Example:
+
+```
+PUT /drivers/{driverId}/availability
+```
+
+### Acceptance
+
+- Driver can become `AVAILABLE`.
+- Driver can become `OFFLINE`.
+- Only `AVAILABLE` drivers can receive offers.
+- `BUSY` drivers cannot receive another ride.
+- Invalid state transitions are rejected.
+
+
+
+---
+
+
+
+# AC-03 - Driver Location
+
+The system must support updating driver location.
+
+Example:
+
+```
+PUT /drivers/{driverId}/location
+```
+
+### Acceptance
+
+- Driver location can be updated.
+- Invalid coordinates are rejected.
+- Latest location is stored.
+- Driver matching uses the latest known location.
+
+
+
+---
+
+
+
+# AC-04 - Driver Matching
+
+When a ride is created, the system must find a suitable driver.
+
+For this challenge, use:
+
+**Nearest available driver within a configurable radius.**
+
+Example:
+
+```
+Passenger
+    |
+    +--- Driver A: 0.8 km
+    |
+    +--- Driver B: 1.5 km
+    |
+    +--- Driver C: 3.2 km
+```
+
+If the maximum radius is 2 km:
+
+```
+Driver A -> Candidate
+Driver B -> Candidate
+Driver C -> Excluded
+```
+
+### Acceptance
+
+- Only available drivers are considered.
+- Drivers outside the radius are excluded.
+- Drivers can be ordered by distance.
+- The nearest suitable driver is selected.
+- No driver is selected when no suitable driver exists.
+
+A simple Haversine distance calculation is sufficient.
+
+
+
+---
+
+
+
+# AC-05 - Ride Offer
+
+The selected driver receives a ride offer.
+
+Example:
+
+```
+Ride R001
+    |
+    v
+Driver D001
+    |
+    +---- ACCEPT
+    |
+    +---- REJECT
+```
+
+### Acceptance
+
+- Ride becomes `DRIVER_ASSIGNED` when a driver is selected.
+- Driver can accept the offer.
+- Driver can reject the offer.
+- Rejected driver cannot immediately receive the same ride again.
+- Rejection causes the system to attempt another driver.
+
+
+
+---
+
+
+
+# AC-06 - Ride State Machine
+
+The ride lifecycle must be explicitly implemented.
+
+Minimum lifecycle:
+
+```
+REQUESTED
+    |
+    v
+MATCHING
+    |
+    v
+DRIVER_ASSIGNED
+    |
+    v
+DRIVER_ACCEPTED
+    |
+    v
+COMPLETED
+```
+
+Cancellation:
+
+```
+REQUESTED --------> CANCELLED
+MATCHING ---------> CANCELLED
+DRIVER_ASSIGNED --> CANCELLED
+```
+
+### Acceptance
+
+- Valid transitions succeed.
+- Invalid transitions are rejected.
+- Duplicate transitions are safely handled.
+- State changes are persisted.
+
+Example:
+
+```
+COMPLETED → DRIVER_ASSIGNED
+```
+
+must be rejected.
+
+
+
+---
+
+
+
+# AC-07 - Rematching
+
+If a driver rejects a ride, the system must attempt to find another driver.
+
+Example:
+
+```
+Ride R001
+    |
+    v
+Driver D001
+    |
+    X REJECT
+    |
+    v
+Find next driver
+    |
+    v
+Driver D002
+    |
+    ✓ ACCEPT
+```
+
+### Acceptance
+
+- Rejected drivers are excluded.
+- Another available driver can be selected.
+- The same driver is not repeatedly selected.
+- If no drivers remain, the ride stays unmatched.
+
+
+
+---
+
+
+
+# AC-08 - Idempotency
+
+The system must safely handle duplicate requests/events.
+
+For example:
+
+```
+RideCreated(R001)
+RideCreated(R001)
+RideCreated(R001)
+```
+
+must not create three rides.
+
+Similarly:
+
+```
+DriverAccepted(R001, D001)
+DriverAccepted(R001, D001)
+```
+
+must not produce an invalid state.
+
+### Acceptance
+
+The solution must demonstrate idempotency for at least:
+
+- Ride creation
+- Driver acceptance
+- Ride state transition
+
+The implementation strategy must be documented.
+
+
+
+---
+
+
+
+# AC-09 - Concurrent Driver Assignment
+
+Two dispatch operations may run at the same time.
+
+Example:
+
+```
+                +---- Worker A ----> Driver D001
+Ride R001 ------|
+                +---- Worker B ----> Driver D001
+```
+
+The system must prevent:
+
+```
+Driver D001
+    |
+    +---- Ride R001
+    |
+    +---- Ride R002
+```
+
+from happening simultaneously.
+
+### Acceptance
+
+- The race condition is identified.
+- The implementation prevents double assignment.
+- A concurrency test demonstrates the behaviour.
+- The chosen concurrency strategy is documented.
+
+Possible approaches:
+
+- Optimistic concurrency
+- Database constraint
+- Atomic update
+- Lock
+- Distributed lock
+
+For this challenge, a simple database-based approach is sufficient.
+
+
+
+---
+
+
+
+# AC-10 - Event-Driven Dispatch
+
+The dispatch process should use asynchronous communication.
+
+For example:
+
+```
+Ride API
+   |
+   | RideCreated
+   v
+Message Broker
+   |
+   v
+Dispatch Handler
+   |
+   v
+Find Driver
+   |
+   v
+Create Ride Offer
+```
+
+A real message broker is **optional**.
+
+Participants may use:
+
+- RabbitMQ
+- Kafka
+- Redis Streams
+- Azure Service Bus
+- AWS SQS
+- In-memory message bus
+
+### Acceptance
+
+The solution must demonstrate:
+
+```
+Ride Created
+     ↓
+Dispatch Event
+     ↓
+Driver Matching
+```
+
+The README must explain:
+
+- Why asynchronous processing was chosen.
+- What happens if the message is delivered twice.
+- What happens if processing fails.
+
+
+
+---
+
+
+
+# AC-11 - Automated Tests
+
+The solution must include automated tests.
+
+Minimum required coverage:
+
+### Matching
+
+- Nearest driver selected.
+- Driver outside radius excluded.
+- Offline driver excluded.
+- Busy driver excluded.
+- No driver available.
+
+### State Machine
+
+- Valid transition.
+- Invalid transition.
+- Duplicate transition.
+
+### Rematching
+
+- Driver rejection.
+- Second driver selected.
+- Rejected driver excluded.
+
+### Concurrency
+
+- Two concurrent assignments cannot assign the same driver.
+
+### Idempotency
+
+- Duplicate ride creation.
+- Duplicate driver acceptance.
+
+
+
+---
+
+
+
+# AC-12 - System Design
+
+The participant must provide a system architecture diagram.
+
+The participant must explain the reasoning.
+
+
+
+---
+
+
+
+# AC-13 - Scalability Design
+
+The implementation does **not** need to operate at massive scale.
+
+However, the participant must explain how the design would evolve from:
+
+```
+1,000 drivers
+        ↓
+100,000 drivers
+        ↓
+1,000,000 drivers
+```
+
+The design should discuss:
+
+- Driver location storage
+- Matching performance
+- Database scaling
+- Message broker scaling
+- Dispatch worker scaling
+- Caching
+- Partitioning
+
+### Acceptance
+
+The participant must identify at least:
+
+- 3 potential bottlenecks.
+- 3 scaling strategies.
+- 2 architectural trade-offs.
+
+
+
+---
+
+
+
+# AC-14 - Observability
+
+The implementation must provide basic observability.
+
+At minimum, logs should allow an engineer to trace a ride using:
+
+```
+rideId
+driverId
+eventId
+```
+
+### Acceptance
+
+An engineer should be able to answer:
+
+"What happened to ride R001?" by following the application logs.
+
+
+
+---
+
+
+
+# AC-15 - Documentation
+
+The repository must contain:
+
+```
+README.md
+
+docs/
+├── architecture.md
+├── sequence-diagram.md
+└── adr/
+    ├── ADR-001-matching.md
+    └── ADR-002-concurrency.md
+```
+
+The README must explain:
+
+- How to run the application.
+- How to run tests.
+- Architecture.
+- Matching strategy.
+- Concurrency strategy.
+- Idempotency strategy.
+- Event-driven approach.
+- Scalability considerations.
+- Known limitations.
+
+
+
+---
+
+
+
+# 🏆 5. Scoring
+
+The challenge is scored out of **100 points**.
+
+Acceptance Criteria are a fundamental part of the scoring.
+
+**A solution cannot receive a high score simply because it has a sophisticated architecture if the required ACs are not satisfied.**
+
+| **Category**                      | **Points** |
+| --------------------------------- | ---------- |
+| Acceptance Criteria               | 35         |
+| System Architecture               | 20         |
+| Distributed Systems & Concurrency | 15         |
+| Testing & Validation              | 15         |
+| Scalability & Performance Design  | 5          |
+| Observability                     | 5          |
+| Documentation & Communication     | 5          |
+| **Total**                         | **100**    |
+
+
+
+
+
+---
+
+
+
+# 🚫 6. What Is NOT Required
+
+To keep the challenge focused, participants do **not** need to implement:
+
+- Payment processing
+- Surge pricing
+- Authentication
+- User registration
+- Driver registration
+- Full trip management
+- Real-time WebSocket communication
+- Multi-region deployment
+- Kubernetes
+- Cloud deployment
+- Production-grade geospatial infrastructure
+- Machine learning
+- Traffic/ETA calculation
+- Mobile applications
+- Admin dashboard
+
+These may be discussed as future extensions.
