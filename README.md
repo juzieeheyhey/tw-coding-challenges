@@ -238,6 +238,10 @@ coding-challenge-{number}/<your-team-name>/
 
 > **TL;DR** — Each challenge is scored out of 100 (+ bonus). Points are tracked per individual across each season of **four** coding challenges; your **Season Score** uses your **top three** challenge scores only. The highest Season Score wins the **Special Prize** (Mac mini M4). **Teams** placing 1st, 2nd, and 3rd at each challenge still receive **vouchers** for that round.
 
+> ⚠️ **Top misunderstanding about the scoring principle**
+>
+> A submission that fully satisfies the **required Acceptance Criteria (ACs)** should score higher than one that follows best practices and clean-code principles but misses important requirements.
+
 ### How Points Work for Teams vs Individuals
 
 | Model            | How It Works                                                                                               |
@@ -387,6 +391,10 @@ Each team gets **10-15 minutes** to present:
 | 5 min | Live demo or code walkthrough |
 | 3 min | Design decisions & trade-offs |
 | 2 min | Lessons learned               |
+
+### 🔍 Deeper Discussion
+
+After Demo Day, we will host a dedicated deep Q&A session for all participating teams to dive deeper into each project, exchange ideas, and discuss technical decisions and challenges.
 
 You can also prepare:
 
