@@ -82,6 +82,10 @@ A modular monolith is completely acceptable.
 
 The important part is demonstrating that the boundaries could evolve into separate services if required.
 
+For this challenge, a real database and message broker are optional. An in-memory database/repository and in-memory message bus are acceptable when they demonstrate the required behaviour. Docker is not required. If external infrastructure is used, the repository must document how to start it.
+
+Drivers and passengers may be represented by seeded or in-memory records; registration flows are out of scope.
+
 
 
 ---
@@ -180,12 +184,21 @@ Request:
 }
 ```
 
+Clients must send an `Idempotency-Key` header with each create request:
+
+```http
+Idempotency-Key: 7f4d9c2e-ride-request-001
+```
+
 ### Acceptance
 
 - A unique `rideId` is generated.
 - Ride starts in `REQUESTED`.
 - Invalid coordinates are rejected.
-- Invalid passenger information is rejected.
+- `passengerId` is required and must reference a seeded or in-memory passenger record.
+- Latitude must be between -90 and 90, and longitude must be between -180 and 180.
+- Repeating the same request with the same `Idempotency-Key` returns the original result without creating another ride.
+- Reusing an `Idempotency-Key` with a different request is rejected.
 - Created ride can be retrieved.
 
 
@@ -274,12 +287,13 @@ Driver C -> Excluded
 ### Acceptance
 
 - Only available drivers are considered.
+- The default maximum radius is 2 km; implementations may make it configurable.
 - Drivers outside the radius are excluded.
 - Drivers can be ordered by distance.
-- The nearest suitable driver is selected.
+- The nearest suitable driver is selected. If drivers are equidistant, the driver with the lexicographically smallest `driverId` is selected.
 - No driver is selected when no suitable driver exists.
 
-A simple Haversine distance calculation is sufficient.
+A simple Haversine distance calculation is sufficient. Coordinates are valid decimal latitude/longitude pairs; invalid or missing values are rejected before matching.
 
 
 
@@ -310,8 +324,20 @@ Driver D001
 - Only the driver holding the current offer can accept or reject it.
 - Acceptance sets the ride to `DRIVER_ACCEPTED` and the driver to `BUSY`.
 - Rejection returns the ride to `MATCHING`, clears `assignedDriverId`, and returns the driver to `AVAILABLE`.
-- A driver who rejects a ride cannot receive another offer for that same ride.
+- A driver who rejects a ride cannot receive another offer for that same ride; this exclusion is permanent for that ride, but does not exclude the driver from other rides.
+- An offer has a configurable response timeout, with a default of 30 seconds. If the driver does not respond before it expires, the offer is treated as rejected, the driver returns to `AVAILABLE`, and the ride returns to `MATCHING`.
 - Rejection causes the system to attempt another eligible driver.
+
+Example endpoints:
+
+```
+POST /rides/{rideId}/offers/{driverId}/accept
+POST /rides/{rideId}/offers/{driverId}/reject
+POST /rides/{rideId}/cancel
+POST /rides/{rideId}/complete
+```
+
+The passenger or an authorised client triggers cancellation while the ride is in `REQUESTED`, `MATCHING`, or `DRIVER_ASSIGNED`. The driver or ride service triggers completion after the trip has been accepted. Cancelling a pending offer returns its driver from `OFFERED` to `AVAILABLE`; cancelling an accepted ride returns its driver from `BUSY` to `AVAILABLE`.
 
 
 
@@ -339,6 +365,7 @@ Cancellation:
 REQUESTED --------> CANCELLED
 MATCHING ---------> CANCELLED
 DRIVER_ASSIGNED --> CANCELLED
+DRIVER_ACCEPTED --> CANCELLED
 ```
 
 ### Acceptance
@@ -347,6 +374,8 @@ DRIVER_ASSIGNED --> CANCELLED
 - Invalid transitions are rejected.
 - Duplicate transitions are safely handled.
 - State changes, including clearing `assignedDriverId` on rejection, are persisted.
+- A timeout follows the same state transition as rejection: `DRIVER_ASSIGNED` to `MATCHING`, with `assignedDriverId` cleared and the driver returned to `AVAILABLE`.
+- `CANCELLED` and `COMPLETED` are terminal ride states. A driver is `AVAILABLE` after either outcome.
 
 Example:
 
@@ -425,7 +454,7 @@ must not produce an invalid state.
 
 The solution must demonstrate idempotency for at least:
 
-- Ride creation
+- Ride creation using an `Idempotency-Key`
 - Driver acceptance
 - Ride state transition
 
@@ -721,6 +750,8 @@ Acceptance Criteria are a fundamental part of the scoring.
 | Observability                     | 5          |
 | Documentation & Communication     | 5          |
 | **Total**                         | **100**    |
+
+Concurrency is intentionally assessed in three related places: Acceptance Criteria (AC-09), Distributed Systems & Concurrency, and Testing & Validation. These categories evaluate different evidence: the required behaviour, the chosen protection strategy, and the automated proof. The same concurrency implementation may support all three categories, but the points are not automatic duplicates; each category must satisfy its own criteria.
 
 ---
 
