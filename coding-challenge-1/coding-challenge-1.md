@@ -255,21 +255,6 @@ Each team submits:
 
 ---
 
-# 🏅 Knowledge Badges
-
-This challenge awards the following **explicit skills**:
-
-- 🟢 *API/Library Design Fundamentals*
-- 🟢 *State Management Basics*
-- 🟢 *Algorithm Design*
-- 🟢 *Design Pattern Application*
-- 🟢 *Unit Testing & Edge Cases*
-- 🟢 *Test-Driven Development (TDD)*
-- 🟢 *Clean Code Practices*
-- 🟢 *Requirement Analysis*
-
----
-
 # 🧮 Scoring Template
 
 ## 🏆 Total: **100 Points** (+ up to 20 bonus)

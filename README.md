@@ -20,6 +20,8 @@ Welcome to the TWVN Coding Challenge! Whether you're a seasoned developer or jus
 
 ---
 
+<a id="why-join"></a>
+
 ## 🌟 Why Join?
 
 - 🚀 **Learn by doing** — Try that framework or pattern you've been curious about
@@ -29,18 +31,19 @@ Welcome to the TWVN Coding Challenge! Whether you're a seasoned developer or jus
 
 ### What You'll Get
 
-- Knowledge Badges for your profile (e.g., 🟢 _TDD Specialist_, 🟢 _Clean Architecture_)
 - A chance to present to the dev community on Demo Day
 - **Team vouchers** for 1st, 2nd, and 3rd place at **each** coding challenge
 - **Season Champion** — highest Season Score wins a **Mac mini M4** at the end of the season
 
 ---
 
+<a id="quick-start-how-to-join"></a>
+
 ## 🚀 Quick Start: How to Join
 
 | Step                  | What to Do                                                                                                                                |
 | --------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| **1. Register**       | Drop a message in `#Vietnam Dev Community` ([join here](https://chat.google.com/room/AAAAm0xrYkU?cls=7))                                  |
+| **1. Register**       | Drop a message in `#VietnamDevCommunity` ([join here](https://chat.google.com/room/AAAAm0xrYkU?cls=7))                                  |
 | **2. Form a Team**    | Join solo, form a team of 2-3 people, or ask in the channel for teammates                                                                 |
 | **3. Attend Kickoff** | Get the challenge brief, repo access, and timeline                                                                                        |
 | **4. Code & Learn**   | Spend 2-3 hours/week coding. Ask questions in the channel anytime                                                                         |
@@ -48,6 +51,8 @@ Welcome to the TWVN Coding Challenge! Whether you're a seasoned developer or jus
 | **6. Present**        | Demo your solution on Demo Day and celebrate!                                                                                             |
 
 ---
+
+<a id="rules--guidelines"></a>
 
 ## 📏 Rules & Guidelines
 
@@ -71,6 +76,8 @@ Welcome to the TWVN Coding Challenge! Whether you're a seasoned developer or jus
 | Open-source libraries                                         |                                 |
 
 ---
+
+<a id="how-to-submit-your-code"></a>
 
 ## 📤 How to Submit Your Code
 
@@ -234,6 +241,8 @@ coding-challenge-{number}/<your-team-name>/
 
 ---
 
+<a id="scoring-leaderboard--prizes"></a>
+
 ## 🏆 Scoring, Leaderboard & Prizes
 
 > **TL;DR** — Each challenge is scored out of 100 (+ bonus). Points are tracked per individual across each season of **four** coding challenges; your **Season Score** uses your **top three** challenge scores only. The highest Season Score wins the **Special Prize** (Mac mini M4). **Teams** placing 1st, 2nd, and 3rd at each challenge still receive **vouchers** for that round.
@@ -359,7 +368,6 @@ Season Score = (Top Score 1) + (Top Score 2) + (Top Score 3)
 **Each coding challenge:**
 
 - 🎟️ **Team vouchers (1st, 2nd, 3rd)** — The top three **teams** for that challenge each receive vouchers according to placement (1st, 2nd, 3rd). This is unchanged: even with the season-long leaderboard, every challenge still has its own team podium and prizes.
-- 🏅 Knowledge Badges for skills demonstrated (e.g., 🟢 _TDD Specialist_, 🟢 _Clean Architecture_)
 - 🎤 Top 3 get the Demo Slot to present to the entire dev community
 
 **End of each season:**
@@ -380,6 +388,8 @@ Season Score = (Top Score 1) + (Top Score 2) + (Top Score 3)
 > ⚠️ **Only commits made before the end of Week 3 (the Deadline) are counted.** Commits pushed after the Deadline will be ignored during scoring. PRs are opened _after_ the Deadline so no one sees your solution before they submit theirs.
 
 ---
+
+<a id="demo-day"></a>
 
 ## 🎤 Demo Day
 
@@ -402,6 +412,8 @@ You can also prepare:
 - Slides (optional, not required)
 
 ---
+
+<a id="tips-for-first-timers"></a>
 
 ## 💡 Tips for First-Timers
 
@@ -428,10 +440,12 @@ You can also prepare:
 
 ---
 
+<a id="faq"></a>
+
 ## ❓ FAQ
 
-**Q: I'm a junior developer. Is this too advanced for me?**
-A: Not at all! This event is designed for **all levels**. You'll be paired with others, and learning is valued as much as the solution itself. Many juniors have won past challenges!
+**Q: I'm still early in my career. Is this too advanced for me?**
+A: Not at all! This event is designed for **all levels**. You'll be paired with others, and learning is valued as much as the solution itself. Developers at every experience level have won past challenges!
 
 **Q: What if I can't finish in time?**
 A: Partial solutions are 100% welcome! Submit what you have and explain what you would do next.
@@ -458,33 +472,37 @@ A: Unless the challenge specifies, use whatever you want! Want to try Rust? Go f
 A: Nope! It's optional. If you do use them (GitHub Copilot, ChatGPT, Cursor, etc.), document how they helped for bonus points.
 
 **Q: What if I have a question not listed here?**
-A: Ask in `#Vietnam Dev Community` ([join here](https://chat.google.com/room/AAAAm0xrYkU?cls=7)) or message the organizers. No question is too small!
+A: Ask in `#VietnamDevCommunity` ([join here](https://chat.google.com/room/AAAAm0xrYkU?cls=7)) or message the organizers. No question is too small!
 
 ---
 
+<a id="communication--contact"></a>
+
 ## 💬 Communication & Contact
 
-**📢 Main Channel:** `#Vietnam Dev Community` ([join here](https://chat.google.com/room/AAAAm0xrYkU?cls=7))
+**📢 Main Channel:** `#VietnamDevCommunity` ([join here](https://chat.google.com/room/AAAAm0xrYkU?cls=7))
 Use this for questions, teammate search, and general discussion.
 
 **🆘 Need Help?**
 
-- Senior devs volunteer as mentors — just ask!
+- Volunteer mentors are happy to help - just ask!
 - Stuck? Post in the channel, we're all here to help.
 
 **📞 Organizers:**
 
 - Steve Lam — <tai.lam@thoughtworks.com>
 - Tom Tang — <tom.tang@thoughtworks.com>
-- Technical Mentors — Check `#Vietnam Dev Community` pinned messages
+- Hanh Tran - <hanh.tran@thoughtworks.com>
+- Quy Ho - <quy.ho@thoughtworks.com>
+- Technical Mentors — Check `#VietnamDevCommunity` pinned messages
 
-**Have ideas to improve the event?** DM the organizers or share in the retro session.
+**Have ideas to improve the event?** DM the organizers.
 
 ---
 
 ## 🚀 Ready to Start?
 
-1. ✅ Join the `#Vietnam Dev Community` space ([join here](https://chat.google.com/room/AAAAm0xrYkU?cls=7))
+1. ✅ Join the `#VietnamDevCommunity` space ([join here](https://chat.google.com/room/AAAAm0xrYkU?cls=7))
 2. ✅ Mark the kickoff event in your calendar
 3. ✅ Start thinking about who you'd like to team up with
 4. ✅ Get excited — this is going to be fun! 🎉
